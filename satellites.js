@@ -1,10 +1,10 @@
 'use strict';
 
-var fs 			= require('fs');
-var readline 	= require('readline');
-var util 		= require('util');
+var fs			= require('fs');
+var readline	= require('readline');
+var util		= require('util');
 
-var utility 	= require('./utility');
+var utility		= require('./utility');
 
 var satellites = [];
 
@@ -64,7 +64,7 @@ satellites.objectify = function(){
 		lineReader.on('close', function (node) {
 			resolve(nodes);
 		});
-	});	
+	});
 };
 
 /*
@@ -77,9 +77,9 @@ and array of targets (satellites, start or end points)
 that got line of sight with distance to each target.
 */
 satellites.neighbours = function(nodeMap){
-	
+
 	var relations = new Map();
-	
+
 	return new Promise(function(resolve, reject){
 		nodeMap.forEach(function(refvalue, refkey, refmap) {
 			var refneighbours = [];
@@ -106,39 +106,39 @@ This is no way optimised for shortest route or
 fewest hops.
 */
 satellites.paths = function(relations){
-	
+
 	//Store file for later debuging by hand.
 	fs.writeFileSync('relations.txt', util.format(relations));
-	
+
 	var route = [];
-	
+
 	return new Promise(function(resolve, reject){
 		
 		var thisNode = "START";
 		var targetNodes = Object.keys(relations.get("END").neighbours);
 		var startNodes = Object.keys(relations.get("START").neighbours);
-		
+
 		var rejects = 0;
 		var rejected = [];
-		
+
 		console.log("Nodes visible for START", startNodes);
 		console.log("Nodes visible for END", targetNodes);
-		
+
 		//Simple brute force loop for finding a valid path
 		while(targetNodes.indexOf(thisNode) == -1){
-			
+
 			route.push(thisNode);
 			thisNode = satellites.nextHop(thisNode, relations, route, rejects, rejected);
-			
+
 			if(thisNode == false){
 				rejects = rejects + 1;
 				rejected.push(route.pop());
 				thisNode = route.pop();
 			} else {
-				rejects = 0;	
+				rejects = 0;
 			}
 		}
-		
+
 		route.push(thisNode);
 		route.push("END");
 		resolve(route);
@@ -150,21 +150,21 @@ satellites.paths = function(relations){
 	Will ignore nodes that have previously determined as
 	ones that dont progress the route finding ie. dead ends.
 	(rejected array).
-	
+
 	We also ignore hops that have already been choosen as
 	a waypoint in the route array.
 */
 satellites.nextHop = function(nodename, relations, route, rejects, rejected){
 	var options = Object.keys(relations.get(nodename).neighbours);
 	var index = 0 + rejects;
-	
+
 	while(true){
 		if(route.indexOf(options[index]) == -1 && rejected.indexOf(options[index]) == -1){
 			var selection = typeof options[index] !== 'undefined' ? options[index] : false;
 			return selection;
 		} else {
 			index = index+1;
-		}	
+		}
 	}
 };
 
