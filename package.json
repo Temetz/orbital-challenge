@@ -1,0 +1,15 @@
+{
+  "name": "reaktor-space-solution",
+  "version": "1.0.0",
+  "description": "Solution for Reaktor Orbital Challenge. https://reaktor.com/orbital-challenge/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Teemu Kontio",
+  "license": "ISC",
+  "dependencies": {
+    "vectorz": "^1.1.0"
+  }
+}
